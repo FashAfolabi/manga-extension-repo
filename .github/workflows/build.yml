@@ -4,6 +4,11 @@ on:
   push:
     branches:
       - main
+    paths:
+      - 'apks/*.apk'
+      - 'scripts/generate_index.py'
+      - '.github/workflows/build.yml'
+
   workflow_dispatch:
 
 jobs:
@@ -11,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repo
+      - name: Checkout repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -20,20 +25,18 @@ jobs:
           python-version: '3.x'
 
       - name: Generate index.json
-        run: python3 scripts/generate_index.py
+        run: python scripts/generate_index.py
 
-      - name: Create GitHub Release
+      - name: Create minified index
+        run: |
+          python -m json.tool index.json > temp.json
+          cat temp.json | tr -d '\n ' > index.min.json
+          rm temp.json
+
+      - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           tag_name: latest
           files: apks/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit updated index
-        run: |
-          git config user.name "github-actions"
-          git config user.email "actions@github.com"
-          git add index.json index.min.json
-          git commit -m "Auto-update index"
-          git push
