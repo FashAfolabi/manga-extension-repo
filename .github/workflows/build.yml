@@ -1,0 +1,39 @@
+name: Generate Index & Release
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Generate index.json
+        run: python3 scripts/generate_index.py
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: latest
+          files: apks/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit updated index
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add index.json index.min.json
+          git commit -m "Auto-update index"
+          git push
