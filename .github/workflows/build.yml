@@ -1,7 +1,7 @@
 name: Generate Index & Release
 
 permissions:
-  contents: write  # Needed to commit JSON files and create release
+  contents: write
 
 on:
   push:
@@ -19,28 +19,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout repo
+      # Checkout repo
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python
+      # Setup Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # Step 3: Generate index.json
+      # Generate JSON
       - name: Generate index.json
         run: python scripts/generate_index.py
 
-      # Step 4: Create minified index.min.json
-      - name: Create minified index
-        run: |
-          python -m json.tool index.json > temp.json
-          cat temp.json | tr -d '\n ' > index.min.json
-          rm temp.json
-
-      # Step 5: Commit index files back to repo
+      # Commit JSON back to repo
       - name: Commit index files
         run: |
           git config user.name "github-actions"
@@ -49,12 +42,12 @@ jobs:
           git commit -m "Auto-update index files" || echo "No changes"
           git push
 
-      # Step 6: Create Release with version tag
-      - name: Create Release
+      # Create Release per APK
+      - name: Create Releases
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v1                 # <--- use version tag instead of "latest"
-          name: "v1 Release"           # Release title
-          files: apks/*.apk            # Upload your APKs
+          tag_name: ${{ github.event.head_commit.message }}
+          name: ${{ github.event.head_commit.message }}
+          files: apks/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
