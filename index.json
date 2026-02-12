@@ -2,7 +2,7 @@
   {
     "name": "Tachiyomi: AllManga",
     "pkg": "eu.kanade.tachiyomi.extension.en.allanime",
-    "apk": "https://github.com/FashAfolabi/manga-extension-repo/releases/download/latest/tachiyomi-en.allanime-v1.4.10.apk",
+    "apk": "https://github.com/FashAfolabi/manga-extension-repo/releases/download/v1.4.10/tachiyomi-en.allanime-v1.4.10.apk",
     "lang": "en",
     "code": 1410,
     "version": "1.4.10",
@@ -20,7 +20,7 @@
   {
     "name": "Tachiyomi: Asura Scans",
     "pkg": "eu.kanade.tachiyomi.extension.en.asurascans",
-    "apk": "https://github.com/FashAfolabi/manga-extension-repo/releases/download/latest/tachiyomi-en.asurascans-v1.4.52.apk",
+    "apk": "https://github.com/FashAfolabi/manga-extension-repo/releases/download/v1.4.52/tachiyomi-en.asurascans-v1.4.52.apk",
     "lang": "en",
     "code": 1452,
     "version": "1.4.52",
