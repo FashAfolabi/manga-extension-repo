@@ -36,6 +36,14 @@ jobs:
           cat temp.json | tr -d '\n ' > index.min.json
           rm temp.json
 
+      - name: Commit index files
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add index.json index.min.json
+          git commit -m "Auto-update index files" || echo "No changes"
+          git push
+
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
