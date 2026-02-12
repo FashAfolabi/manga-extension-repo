@@ -1,52 +1,62 @@
-import os
 import json
+import os
+import re
 
-# Base URL for GitHub Releases
-repo_url = "https://github.com/FashAfolabi/manga-extension-repo/releases/latest/download/"
+repo_owner = "FashAfolabi"
+repo_name = "manga-extension-repo"
 
-apk_folder = "apks"
+base_download_url = f"https://github.com/{repo_owner}/{repo_name}/releases/download/latest"
+
 extensions = []
 
-for apk in os.listdir(apk_folder):
+for apk in os.listdir("apks"):
     if apk.endswith(".apk"):
-        # Generate a friendly name
-        name = apk.replace(".apk", "").replace("tachiyomi-en.", "").replace("-", " ").title()
-        
-        # Hardcode sourceId and versionCode for your two extensions
-        if "allanime" in apk:
-            source_id = 4709139914729853090
-            version_code = 10
-            version = "1.4.10"
-        elif "asurascans" in apk:
-            source_id = 6247824327199706550
-            version_code = 52
-            version = "1.4.52"
+        name_match = re.search(r'tachiyomi-en\.(.*?)-v', apk)
+        version_match = re.search(r'-v([\d\.]+)\.apk', apk)
+
+        if not name_match or not version_match:
+            continue
+
+        ext_name = name_match.group(1)
+        version = version_match.group(1)
+        version_code = int(version.replace(".", ""))
+
+        if "asurascans" in apk:
+            display_name = "Tachiyomi: Asura Scans"
+            pkg = "eu.kanade.tachiyomi.extension.en.asurascans"
+            source_name = "Asura Scans"
+            source_id = "6247824327199706550"
+            base_url = "https://asuracomic.net"
+
+        elif "allanime" in apk:
+            display_name = "Tachiyomi: AllManga"
+            pkg = "eu.kanade.tachiyomi.extension.en.allanime"
+            source_name = "AllManga"
+            source_id = "4709139914729853090"
+            base_url = "https://allmanga.to"
+
         else:
-            source_id = 0
-            version_code = 1
-            version = "1.0.0"
+            continue
 
         extensions.append({
-            "name": f"Tachiyomi: {name}",
-            "pkg": f"eu.kanade.tachiyomi.extension.en.{apk.split('-')[1].split('.')[0]}",
-            "apk": repo_url + apk,
+            "name": display_name,
+            "pkg": pkg,
+            "apk": f"{base_download_url}/{apk}",
             "lang": "en",
+            "code": version_code,
             "version": version,
-            "versionCode": version_code,
             "nsfw": 0,
             "sources": [
                 {
-                    "name": name,
+                    "name": source_name,
                     "lang": "en",
-                    "id": source_id
+                    "id": source_id,
+                    "baseUrl": base_url
                 }
             ]
         })
 
-# Write index.json
 with open("index.json", "w") as f:
     json.dump(extensions, f, indent=2)
 
-# Write index.min.json
-with open("index.min.json", "w") as f:
-    json.dump(extensions, f, separators=(",", ":"))
+print("index.json generated successfully.")
