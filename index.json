@@ -7,6 +7,7 @@
     "code": 1410,
     "version": "1.4.10",
     "nsfw": 0,
+    "icon": "https://raw.githubusercontent.com/FashAfolabi/manga-extension-repo/main/icons/eu.kanade.tachiyomi.extension.en.allanime.png",
     "sources": [
       {
         "name": "AllManga",
@@ -24,6 +25,7 @@
     "code": 1452,
     "version": "1.4.52",
     "nsfw": 0,
+    "icon": "https://raw.githubusercontent.com/FashAfolabi/manga-extension-repo/main/icons/eu.kanade.tachiyomi.extension.en.asurascans.png",
     "sources": [
       {
         "name": "Asura Scans",
