@@ -2,6 +2,7 @@ import json
 import os
 import re
 
+# ---------------- CONFIG ----------------
 repo_owner = "FashAfolabi"
 repo_name = "manga-extension-repo"
 
@@ -13,13 +14,14 @@ base_icon_url = f"https://raw.githubusercontent.com/{repo_owner}/{repo_name}/mai
 
 extensions = []
 
+# ---------------- SCAN APKs ----------------
 for apk in os.listdir(apks_folder):
     if not apk.endswith(".apk"):
         continue
 
-    # Extract extension key and version
     name_match = re.search(r'tachiyomi-en\.(.*?)-v', apk)
     version_match = re.search(r'-v([\d\.]+)\.apk', apk)
+
     if not name_match or not version_match:
         continue
 
@@ -27,6 +29,7 @@ for apk in os.listdir(apks_folder):
     version = version_match.group(1)
     version_code = int(version.replace(".", ""))
 
+    # ---------------- EXTENSION METADATA ----------------
     if "asurascans" in ext_key:
         display_name = "Tachiyomi: Asura Scans"
         pkg = "eu.kanade.tachiyomi.extension.en.asurascans"
@@ -64,6 +67,7 @@ for apk in os.listdir(apks_folder):
         ]
     })
 
+# ---------------- WRITE JSON ----------------
 with open("index.json", "w") as f:
     json.dump(extensions, f, indent=2)
 
