@@ -1,7 +1,7 @@
 name: Generate Index & Release
 
 permissions:
-  contents: write
+  contents: write  # allows commit + releases
 
 on:
   push:
@@ -11,7 +11,6 @@ on:
       - 'apks/*.apk'
       - 'scripts/generate_index.py'
       - '.github/workflows/build.yml'
-
   workflow_dispatch:
 
 jobs:
@@ -19,21 +18,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout repo
-      - name: Checkout repository
+      # ---------- Checkout ----------
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      # Setup Python
+      # ---------- Python ----------
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.x'
 
-      # Generate JSON
+      # ---------- Generate JSON ----------
       - name: Generate index.json
         run: python scripts/generate_index.py
 
-      # Commit JSON back to repo
+      # ---------- Commit JSON ----------
       - name: Commit index files
         run: |
           git config user.name "github-actions"
@@ -42,12 +41,22 @@ jobs:
           git commit -m "Auto-update index files" || echo "No changes"
           git push
 
-      # Create Release per APK
-      - name: Create Releases
-        uses: softprops/action-gh-release@v1
-        with:
-          tag_name: ${{ github.event.head_commit.message }}
-          name: ${{ github.event.head_commit.message }}
-          files: apks/*.apk
+      # ---------- Create Release per APK ----------
+      - name: Create Releases per APK
+        run: |
+          for apk in apks/*.apk; do
+            # Extract version from filename
+            version=$(echo $apk | grep -oP '-v\K[\d\.]+')
+            tag_name="v$version"
+
+            # Check if tag already exists
+            if git rev-parse "refs/tags/$tag_name" >/dev/null 2>&1; then
+              echo "Tag $tag_name already exists, skipping release."
+              continue
+            fi
+
+            # Create GitHub release using softprops/action-gh-release
+            gh release create $tag_name $apk --title "$tag_name Release" --notes "Automated release for $apk" || echo "Release $tag_name failed"
+          done
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
