@@ -3,14 +3,8 @@ import os
 import re
 
 # ---------------- CONFIG ----------------
-repo_owner = "FashAfolabi"
-repo_name = "manga-extension-repo"
-
 apks_folder = "apks"
 icons_folder = "icons"
-
-base_apk_url = f"https://raw.githubusercontent.com/{repo_owner}/{repo_name}/main/{apks_folder}"
-base_icon_url = f"https://raw.githubusercontent.com/{repo_owner}/{repo_name}/main/{icons_folder}"
 
 extensions = []
 
@@ -21,7 +15,6 @@ for apk in os.listdir(apks_folder):
 
     name_match = re.search(r'tachiyomi-en\.(.*?)-v', apk)
     version_match = re.search(r'-v([\d\.]+)\.apk', apk)
-
     if not name_match or not version_match:
         continue
 
@@ -45,18 +38,20 @@ for apk in os.listdir(apks_folder):
     else:
         continue
 
-    apk_url = f"{base_apk_url}/{apk}"
-    icon_url = f"{base_icon_url}/{pkg}.png"
+    # ←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←←
+    # RELATIVE PATHS (this fixes icons + APK 404)
+    apk_path = f"{apks_folder}/{apk}"
+    icon_path = f"{icons_folder}/{pkg}.png"
 
     extensions.append({
         "name": display_name,
         "pkg": pkg,
-        "apk": apk_url,
+        "apk": apk_path,           # ← changed
         "lang": "en",
         "code": version_code,
         "version": version,
         "nsfw": 0,
-        "icon": icon_url,
+        "icon": icon_path,         # ← changed
         "sources": [
             {
                 "name": source_name,
@@ -74,4 +69,4 @@ with open("index.json", "w") as f:
 with open("index.min.json", "w") as f:
     json.dump(extensions, f, separators=(',', ':'))
 
-print("✅ index.json and index.min.json generated successfully.")
+print("✅ index.json and index.min.json generated successfully (relative paths).")
